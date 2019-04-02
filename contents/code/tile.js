@@ -107,7 +107,6 @@ function Tile(firstClient, tileIndex) {
         this.screenGapSizeBottom = KWin.readConfig("screenGapSizeBottom", 0);
         // Do this manually instead of calling "addClient" to not try to resize
         // because we don't have a rectangle at this point
-        firstClient.keepBelow = true;
         if (KWin.readConfig("noBorder", false)) {
             firstClient.noBorder = true;
         }
@@ -340,8 +339,6 @@ Tile.prototype.onClientScreenChanged = function(client) {
 };
 
 Tile.prototype.onClientStartUserMovedResized = function(client) {
-    // Let client stay above the other tilers so the user sees the move
-    client.keepBelow = false;
 };
 
 Tile.prototype.onClientStepUserMovedResized = function(client) {
@@ -373,8 +370,6 @@ Tile.prototype.onClientFinishUserMovedResized = function(client) {
             this._resizing = false;
             this.resizingEnded.emit();
         }
-        // Put the client on the same layer as the other tilers again
-        client.keepBelow = true;
     } catch(err) {
         print(err, "in Tile.onClientFinishUserMovedResized");
     }
@@ -391,7 +386,6 @@ Tile.prototype.removeClient = function(client) {
 Tile.prototype.addClient = function(client) {
     try {
         if (this.clients.indexOf(client) == -1) {
-            client.keepBelow = true;
             if (KWin.readConfig("noBorder", false)) {
                 client.noBorder = true;
             }
@@ -406,12 +400,10 @@ Tile.prototype.addClient = function(client) {
 
 Tile.prototype.onClientMaximizedStateChanged = function(client, h, v) {
     try {
-        // Set keepBelow to keep maximized clients over tiled ones
         // TODO: We don't distinguish between horizontal and vertical maximization,
         // also there's no way to find that the _user_ caused this.
         // So we might want to ignore maximization entirely.
         if (h || v) {
-            client.keepBelow = false;
             // We might get a geometryChanged signal before this
             // so we need to manually maximize the client.
             client.tiling_resize = true;
@@ -420,7 +412,6 @@ Tile.prototype.onClientMaximizedStateChanged = function(client, h, v) {
             this.maximized = true;
         } else {
             this.maximized = false;
-            client.keepBelow = true;
         }
     } catch(err) {
         print(err, "in tile.onClientMaximizedStateChanged");
