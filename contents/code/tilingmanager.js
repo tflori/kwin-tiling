@@ -463,7 +463,7 @@ function TilingManager(timer) {
                                               var index2 = 0;
                                           } else {
                                               var index2 = index1 + 1;
-                                          } 
+                                          }
                                           workspace.activeClient = layout.tiles[index2].clients[0];
                                       }
                                   } catch(err) {
@@ -488,7 +488,7 @@ function TilingManager(timer) {
                                               var index2 = layout.tiles.length-1;
                                           } else {
                                               var index2 = index1 - 1;
-                                          } 
+                                          }
                                           workspace.activeClient = layout.tiles[index2].clients[0];
                                       }
                                   } catch(err) {
@@ -513,7 +513,7 @@ function TilingManager(timer) {
                                               var index2 = 0;
                                           } else {
                                               var index2 = index1 + 1;
-                                          } 
+                                          }
                                           layout.swapTiles(tile, layout.tiles[index2]);
                                       }
                                   } catch(err) {
@@ -538,7 +538,7 @@ function TilingManager(timer) {
                                               var index2 = layout.tiles.length-1;
                                           } else {
                                               var index2 = index1 - 1;
-                                          } 
+                                          }
                                           layout.swapTiles(tile, layout.tiles[index2]);
                                       }
                                   } catch(err) {
@@ -1121,8 +1121,14 @@ TilingManager.prototype._dumpClients = function() {
             outp += " Screen " + j + "\n";
             for (var k = 0; k < this.layouts[i][j].tiles.length; k++) {
                 outp += "  Tile " + k + "\n";
+                var tileList = this.layouts[i][j];
                 this.layouts[i][j].tiles[k].clients.forEach(function(c) {
-                    outp += "    " + c.resourceClass.toString() + '- "' + c.caption + '"\n';
+                    try {
+                      outp += "    " + c.resourceClass.toString() + '- "' + c.caption + '"\n';
+                    } catch(e) {
+                      outp += "    Error: " + e + "\n";
+                      tileList._removeTile(k);
+                    }
                 });
             }
         }
