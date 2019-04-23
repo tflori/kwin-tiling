@@ -120,13 +120,11 @@ TileList.prototype.connectSignals = function(client) {
         client.fullScreenChanged.connect(function() {
             if (client.fullScreen == true) {
                 client.tiling_floating = true;
-                client.keepBelow = false;
             } else {
                 // If we already have a tile, just reset the geometry
                 var tile = getTile(client);
                 if (tile != null) {
                     client.tiling_floating = false;
-                    client.keepBelow = true;
                     tile.onClientGeometryChanged(client);
                 } else {
                     self.addClient(client);
@@ -245,7 +243,6 @@ TileList.prototype.addClient = function(client) {
     }
     if (this._isIgnored(client)) {
         client.tiling_tileIndex = -1;
-        client.keepBelow = false;
         // WARNING: This crashes kwin!
         //client.tiling_floating = true;
         return;
@@ -263,7 +260,6 @@ TileList.prototype.addClient = function(client) {
     // they'll be added once that changes.
     if (client.fullScreen
        || client.minimized) {
-        client.keepBelow = false;
         return;
     }
 
@@ -292,9 +288,6 @@ TileList.prototype.getTile = function(client) {
 */
 TileList.prototype.untileClient = function(client) {
     try {
-        // Unset keepBelow because we set it when tiling
-        client.keepBelow = false;
-
         // Don't remove tileIndex, so we can move the window to its position in case it comes back (after minimize etc)
         //client.tiling_tileIndex = - 1;
         if (client.tiling_floating == true) {
